@@ -17,19 +17,22 @@ Familiarity _shift(Familiarity level, int steps) {
 }
 
 /// 处理一次答题（spec §4.3 规则 1-3）。
-AnswerOutcome applyAnswer(WordState state,
-    {required bool correct, required DateTime now}) {
+AnswerOutcome applyAnswer(
+  WordState state, {
+  required bool correct,
+  required DateTime now,
+}) {
   if (correct) {
     final count = state.correctCountInLevel + 1;
     if (count < correctAnswersToPromote) {
-      // 本档未集满：留在原档，按当前进度排到下一个间隔
+      // 本档未集满：留在原档。本档第 1 次答对后排到间隔 2（ladder.$2），
+      // 间隔 1（ladder.$1）已在进入该档时（newWord/升档/手动调档）使用。
       final ladder = intervalLadder[state.familiarity]!;
-      final next = count == 1 ? ladder.$1 : ladder.$2;
       return AnswerOutcome(
         newState: state.copyWith(
           correctCountInLevel: count,
           lastReviewedAt: now,
-          nextDueAt: next.dueFrom(now),
+          nextDueAt: ladder.$2.dueFrom(now),
         ),
         reappearInSession: false,
       );
