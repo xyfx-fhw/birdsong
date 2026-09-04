@@ -10,7 +10,8 @@ class ReviewInterval {
 
   /// 从 base 推算到期时间。月间隔按日历月计算，日溢出收敛到月末。
   DateTime dueFrom(DateTime base) {
-    if (_minutes != null) return base.add(Duration(minutes: _minutes!));
+    final minutes = _minutes;
+    if (minutes != null) return base.add(Duration(minutes: minutes));
     final m = months!;
     final totalMonths = base.year * 12 + (base.month - 1) + m;
     final year = totalMonths ~/ 12;
