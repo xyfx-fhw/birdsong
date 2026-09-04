@@ -1,0 +1,12 @@
+name: srs_core
+description: 学个鸟语 - SRS 学习引擎（熟悉度/艾宾浩斯/任务编排/成就）
+version: 0.1.0
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.13.0
+dependencies:
+  content_models:
+    path: ../content_models
+dev_dependencies:
+  test: ^1.25.0

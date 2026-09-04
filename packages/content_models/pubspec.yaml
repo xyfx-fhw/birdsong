@@ -1,0 +1,9 @@
+name: content_models
+description: 学个鸟语 - 词表与每日内容共享数据模型
+version: 0.1.0
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.13.0
+dev_dependencies:
+  test: ^1.25.0

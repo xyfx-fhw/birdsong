@@ -24,3 +24,9 @@ yarn-error.log*
 # Trae (superpowers 仅本机使用，不提交)
 .trae/skills/
 .trae/rules/superpowers.md
+
+# Dart/Flutter
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies

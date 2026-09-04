@@ -1,0 +1,15 @@
+name: content_pipeline
+description: 学个鸟语 - 内容构建管线（content_src → content.db）
+version: 0.1.0
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.13.0
+dependencies:
+  content_models:
+    path: ../../packages/content_models
+  sqlite3: ^2.4.0
+  args: ^2.5.0
+  path: ^1.9.0
+dev_dependencies:
+  test: ^1.25.0
