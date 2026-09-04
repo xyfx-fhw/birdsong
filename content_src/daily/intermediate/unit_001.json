@@ -1,0 +1,30 @@
+{
+  "stage": "intermediate",
+  "unit": 1,
+  "new_words": ["water", "apple", "book", "house", "friend", "morning", "food", "work", "school", "family"],
+  "sentences": [
+    {"en": "I drink water and eat an apple every morning.", "zh": "我每天早上喝水、吃苹果。", "focus_words": ["water", "apple", "morning"]},
+    {"en": "My friend reads a book at school.", "zh": "我的朋友在学校看书。", "focus_words": ["friend", "read", "book", "school"]},
+    {"en": "My family enjoys the food at home.", "zh": "我的家人喜欢家里的食物。", "focus_words": ["family", "food", "house"]}
+  ],
+  "dialogues": [
+    {
+      "turns": [
+        {"speaker": "A", "en": "Do you want some water?", "zh": "你想喝点水吗？"},
+        {"speaker": "B", "en": "Yes, please. I also want an apple.", "zh": "好的。我还想要一个苹果。"},
+        {"speaker": "A", "en": "The food here is great.", "zh": "这里的食物很棒。"}
+      ]
+    }
+  ],
+  "readings": [
+    {
+      "title": "My Morning",
+      "body": "Every morning, I drink water and eat an apple. Then I go to school with my friend. We read books and talk about our family. I like my school life. It makes me happy. After school, I go home and help my family with the food. In the evening, I write in my book and dream about tomorrow.",
+      "focus_words": ["morning", "water", "apple", "school", "friend", "book", "family", "food", "write", "dream"]
+    }
+  ],
+  "writing_prompts": [
+    {"type": "fill_blank", "question": "I drink ___ every morning.", "answer": "water", "focus_words": ["water"]},
+    {"type": "fill_blank", "question": "My ___ reads a book at school.", "answer": "friend", "focus_words": ["friend"]}
+  ]
+}

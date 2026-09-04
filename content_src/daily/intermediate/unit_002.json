@@ -1,0 +1,30 @@
+{
+  "stage": "intermediate",
+  "unit": 2,
+  "new_words": ["happy", "read", "write", "listen", "speak", "city", "weather", "music", "travel", "dream"],
+  "sentences": [
+    {"en": "I am happy to read and write every day.", "zh": "我每天读写都很开心。", "focus_words": ["happy", "read", "write"]},
+    {"en": "We listen to music and speak about travel.", "zh": "我们听音乐，聊旅行。", "focus_words": ["listen", "music", "speak", "travel"]},
+    {"en": "The weather in this city is nice.", "zh": "这个城市的天气很好。", "focus_words": ["weather", "city"]}
+  ],
+  "dialogues": [
+    {
+      "turns": [
+        {"speaker": "A", "en": "What is your dream?", "zh": "你的梦想是什么？"},
+        {"speaker": "B", "en": "I want to travel to a big city.", "zh": "我想去一座大城市旅行。"},
+        {"speaker": "A", "en": "That sounds happy. The weather there is nice too.", "zh": "听起来很开心。那里天气也不错。"}
+      ]
+    }
+  ],
+  "readings": [
+    {
+      "title": "A Happy Trip",
+      "body": "Last summer, I traveled to a big city. The weather was nice. I listened to music on the train and read a book. In the city, I spoke with new friends. We talked about dreams and music. I wrote about the trip in my book. It was a happy journey, and I want to travel again.",
+      "focus_words": ["travel", "city", "weather", "listen", "music", "read", "speak", "friend", "dream", "write", "happy"]
+    }
+  ],
+  "writing_prompts": [
+    {"type": "fill_blank", "question": "The ___ in this city is nice.", "answer": "weather", "focus_words": ["weather"]},
+    {"type": "free_write", "question": "用 dream 和 travel 写一句话。", "answer": "", "focus_words": ["dream", "travel"]}
+  ]
+}
