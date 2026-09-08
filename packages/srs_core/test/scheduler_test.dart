@@ -31,6 +31,15 @@ void main() {
       );
       expect(isDue(s, DateTime(2027, 1, 1)), isFalse);
     });
+
+    test('到期日当天任意时刻均算到期（按天粒度）', () {
+      // 9/8 20:00 学习并答对一次 → 到期 9/12 20:00（模糊档间隔 4 天）。
+      // 每日会话开始时间不固定，到期日当天上午就应可复习。
+      var s = WordState.newWord('a', DateTime(2026, 9, 8, 20));
+      s = applyAnswer(s, correct: true, now: DateTime(2026, 9, 8, 20)).newState;
+      expect(s.nextDueAt, DateTime(2026, 9, 12, 20));
+      expect(isDue(s, DateTime(2026, 9, 12, 10)), isTrue);
+    });
   });
 
   group('规则6：次日强制复习', () {

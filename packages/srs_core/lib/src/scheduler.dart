@@ -15,11 +15,12 @@ bool needsNextDayReview(WordState s, DateTime now) {
 }
 
 /// 到期判定：常规到期 或 次日强制复习命中。
+/// 按天粒度：到期日当天任意时刻均算到期（每日会话开始时间不固定）。
 bool isDue(WordState s, DateTime now) {
   if (s.graduated) return false;
   if (needsNextDayReview(s, now)) return true;
   final due = s.nextDueAt;
-  return due != null && !due.isAfter(now);
+  return due != null && !_dayStart(due).isAfter(_dayStart(now));
 }
 
 /// 当前所有到期词，按到期时间升序（最久的排最前）。
