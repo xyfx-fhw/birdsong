@@ -8,7 +8,7 @@ environment:
 dependencies:
   content_models:
     path: ../../packages/content_models
-  sqlite3: ^2.4.0
+  sqlite3: ^3.0.0
   args: ^2.5.0
   path: ^1.9.0
 dev_dependencies:

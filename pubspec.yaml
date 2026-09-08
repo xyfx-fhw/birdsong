@@ -6,6 +6,7 @@ workspace:
   - packages/content_models
   - packages/srs_core
   - tools/content_pipeline
+  - app
 
 dev_dependencies:
   melos: ^8.6.0
@@ -15,4 +16,6 @@ melos:
     analyze:
       run: melos exec -- dart analyze --fatal-infos
     test:
-      run: melos exec --dir-exists=test -- dart test
+      run: melos exec --dir-exists=test --no-flutter -- dart test
+    test_flutter:
+      run: melos exec --dir-exists=test --flutter -- flutter test
