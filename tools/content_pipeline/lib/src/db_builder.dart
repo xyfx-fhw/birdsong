@@ -83,6 +83,6 @@ void buildContentDb({
     db.execute("INSERT INTO meta VALUES ('content_version', '$contentVersion')");
     db.execute('COMMIT');
   } finally {
-    db.dispose();
+    db.close();
   }
 }

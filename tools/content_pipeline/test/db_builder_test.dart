@@ -44,7 +44,7 @@ void main() {
     buildContentDb(content: result, outputPath: out, contentVersion: 1);
 
     final db = sqlite3.open(out);
-    addTearDown(db.dispose);
+    addTearDown(db.close);
 
     expect(
         db
@@ -65,7 +65,7 @@ void main() {
     buildContentDb(content: result, outputPath: out, contentVersion: 1);
     buildContentDb(content: result, outputPath: out, contentVersion: 2);
     final db = sqlite3.open(out);
-    addTearDown(db.dispose);
+    addTearDown(db.close);
     expect(
         db
             .select('SELECT value FROM meta WHERE key = ?', ['content_version'])

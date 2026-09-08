@@ -14,7 +14,7 @@ class ContentRepository {
   static ContentRepository open(String path) =>
       ContentRepository._(sqlite3.open(path, mode: OpenMode.readOnly));
 
-  void dispose() => _db.dispose();
+  void dispose() => _db.close();
 
   /// 某阶段全部词条（含例句），按词频升序。
   List<WordEntry> wordsOfStage(Stage stage) {
@@ -88,8 +88,10 @@ class ContentRepository {
         sentences: _decodeList(r['sentences'] as String, SentenceItem.fromJson),
         dialogues: _decodeList(r['dialogues'] as String, Dialogue.fromJson),
         readings: _decodeList(r['readings'] as String, ReadingItem.fromJson),
-        writingPrompts:
-            _decodeList(r['writing_prompts'] as String, WritingPrompt.fromJson),
+        writingPrompts: _decodeList(
+          r['writing_prompts'] as String,
+          WritingPrompt.fromJson,
+        ),
       );
     }).toList();
   }
@@ -111,9 +113,10 @@ class ContentRepository {
           .toList();
 
   List<T> _decodeList<T>(
-      String json, T Function(Map<String, dynamic>) fromJson) =>
-      (jsonDecode(json) as List)
-          .cast<Map<String, dynamic>>()
-          .map(fromJson)
-          .toList();
+    String json,
+    T Function(Map<String, dynamic>) fromJson,
+  ) => (jsonDecode(json) as List)
+      .cast<Map<String, dynamic>>()
+      .map(fromJson)
+      .toList();
 }

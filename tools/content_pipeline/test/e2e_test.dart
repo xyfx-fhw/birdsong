@@ -25,7 +25,7 @@ void main() {
 
     final db = sqlite3.open(out);
     addTearDown(() {
-      db.dispose();
+      db.close();
       File(out).deleteSync();
     });
     expect(db.select('SELECT COUNT(*) AS n FROM words').single['n'], 20);

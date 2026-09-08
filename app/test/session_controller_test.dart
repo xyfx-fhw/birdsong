@@ -4,11 +4,9 @@ import 'package:birdsong_app/controllers/session_controller.dart';
 import 'package:birdsong_app/data/content_repository.dart';
 import 'package:birdsong_app/data/user_database.dart';
 import 'package:birdsong_app/data/word_state_store.dart';
-import 'package:content_models/content_models.dart';
 import 'package:content_pipeline/content_pipeline.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:srs_core/srs_core.dart';
 
 void main() {
   late Directory tmp;
