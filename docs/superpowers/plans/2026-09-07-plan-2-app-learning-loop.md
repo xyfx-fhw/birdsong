@@ -1052,7 +1052,8 @@ enum SessionPhase { review, newWords, consolidation, done, empty }
 /// 学习会话编排器（UI 无关）。
 ///
 /// 流程：复习到期词 → 学新词 → 串词巩固 → 打卡完成。
-/// 规则 5（当日必过/会话内重现）：答错的词重新入队，直到答对。
+/// 规则 5（当日必过/会话内重现）：新词答错进入重学队列（排在本批新词之后），
+/// 复习答错回到复习队尾，直到答对。
 class SessionController {
   SessionController({
     required this.store,
@@ -1073,6 +1074,7 @@ class SessionController {
 
   final List<WordState> _reviewQueue = [];
   final List<String> _newWordQueue = [];
+  final List<WordState> _relearnQueue = []; // 新词答错后的重现队列
   final List<String> _learnedToday = [];
   WordState? _current;
   late Stage _stage;
@@ -1087,6 +1089,9 @@ class SessionController {
   /// 今天已学新词数。
   int get newWordsLearned => _learnedToday.length;
 
+  static bool _sameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
   /// 开始会话。返回 false 表示今天没有可学内容（phase = empty）。
   Future<bool> start() async {
     final now = _clock();
@@ -1094,7 +1099,15 @@ class SessionController {
     _stage = await store.currentStage();
     final states = await store.allStates();
     final learned = states.map((s) => s.word).toSet();
-    final pending = content.pendingNewWords(_stage, learned);
+
+    // 每日新词配额扣减：同一天重开会话不能重复学新词
+    final learnedTodayCount =
+        states.where((s) => _sameDay(s.learnedOn, now)).length;
+    final remainingQuota = _stage.dailyNewWords - learnedTodayCount;
+    final pending = remainingQuota <= 0
+        ? <String>[]
+        : content.pendingNewWords(_stage, learned).take(remainingQuota).toList();
+
     final plan = planSession(
       stage: _stage,
       allStates: states,
@@ -1108,6 +1121,7 @@ class SessionController {
     _newWordQueue
       ..clear()
       ..addAll(plan.newWords);
+    _relearnQueue.clear();
     _learnedToday.clear();
     reviewsCompleted = 0;
     wrongCount = 0;
@@ -1130,7 +1144,11 @@ class SessionController {
     await store.save(outcome.newState);
     if (!correct) {
       wrongCount++;
-      _reviewQueue.add(outcome.newState); // 会话内重现，当日必过
+      if (phase == SessionPhase.newWords) {
+        _relearnQueue.add(outcome.newState); // 本批新词学完后重现
+      } else {
+        _reviewQueue.add(outcome.newState); // 复习队尾重现
+      }
     } else if (phase == SessionPhase.review) {
       reviewsCompleted++;
     }
@@ -1156,6 +1174,11 @@ class SessionController {
       await store.save(state); // 立即持久化：即使中途退出也记录 learnedOn
       _learnedToday.add(word);
       _current = state;
+      return;
+    }
+    if (_relearnQueue.isNotEmpty) {
+      phase = SessionPhase.newWords; // 重学仍属今日新词环节
+      _current = _relearnQueue.removeAt(0);
       return;
     }
     // 队列清空 → 串词巩固或直接完成
@@ -1396,7 +1419,7 @@ class HomePage extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('加载失败: $e')),
         data: (vm) => RefreshIndicator(
-          onRefresh: () => ref.invalidate(todayViewModelProvider),
+          onRefresh: () async => ref.invalidate(todayViewModelProvider),
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
