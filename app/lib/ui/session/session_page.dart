@@ -25,6 +25,9 @@ class _SessionPageState extends ConsumerState<SessionPage> {
 
   Future<void> _answer(bool correct) async {
     if (_busy) return;
+    if (c.phase != SessionPhase.review && c.phase != SessionPhase.newWords) {
+      return;
+    }
     setState(() => _busy = true);
     await c.answer(correct: correct);
     if (!mounted) return;
