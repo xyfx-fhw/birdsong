@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../controllers/providers.dart';
 import '../controllers/session_controller.dart';
+import 'session/consolidation_view.dart';
 import 'session/session_page.dart';
 
 /// 今日页：任务概览 + 开始学习入口。
@@ -130,13 +131,13 @@ class HomePage extends ConsumerWidget {
       return false;
     }
     if (context.mounted) {
-      // 会话（含巩固页）结束返回首页时刷新今日页
+      // 恢复路径（巩固打断后重进）时 phase 为 consolidation 且无当前卡片，
+      // 直接进巩固页；否则进会话页。会话链结束返回首页时刷新今日页。
+      final page = controller.phase == SessionPhase.consolidation
+          ? ConsolidationView(controller: controller)
+          : SessionPage(controller: controller);
       Navigator.of(context)
-          .push(
-            MaterialPageRoute(
-              builder: (_) => SessionPage(controller: controller),
-            ),
-          )
+          .push(MaterialPageRoute(builder: (_) => page))
           .then((_) => ref.invalidate(todayViewModelProvider));
     }
     return true;

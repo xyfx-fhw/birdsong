@@ -40,9 +40,17 @@ class _SessionPageState extends ConsumerState<SessionPage> {
 
   void _syncPhase() {
     if (c.phase == SessionPhase.consolidation) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => ConsolidationView(controller: c)),
-      );
+      // 用 push（而非 pushReplacement）保留会话页在栈中：
+      // pushReplacement 会让首页 push 的 Future 在进入巩固页时就完成，
+      // 导致打卡前的旧数据被刷新。改为巩固页关闭后会话页再自行 pop，
+      // 保证首页的刷新发生在整条会话链真正结束之后。
+      Navigator.of(context)
+          .push(
+            MaterialPageRoute(builder: (_) => ConsolidationView(controller: c)),
+          )
+          .then((_) {
+            if (mounted) Navigator.of(context).pop();
+          });
     } else if (c.phase == SessionPhase.done) {
       Navigator.of(context).pop();
     }
