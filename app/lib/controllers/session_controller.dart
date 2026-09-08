@@ -42,7 +42,8 @@ class SessionController {
   WordState get current => _current!;
 
   /// 当前复习队列长度（UI 展示进度用）。
-  int get reviewsDue => _reviewQueue.length + (phase == SessionPhase.review ? 1 : 0);
+  int get reviewsDue =>
+      _reviewQueue.length + (phase == SessionPhase.review ? 1 : 0);
 
   /// 今天已学新词数。
   int get newWordsLearned => _learnedToday.length;
@@ -59,12 +60,16 @@ class SessionController {
     final learned = states.map((s) => s.word).toSet();
 
     // 每日新词配额扣减：同一天重开会话不能重复学新词
-    final learnedTodayCount =
-        states.where((s) => _sameDay(s.learnedOn, now)).length;
+    final learnedTodayCount = states
+        .where((s) => _sameDay(s.learnedOn, now))
+        .length;
     final remainingQuota = _stage.dailyNewWords - learnedTodayCount;
     final pending = remainingQuota <= 0
         ? <String>[]
-        : content.pendingNewWords(_stage, learned).take(remainingQuota).toList();
+        : content
+              .pendingNewWords(_stage, learned)
+              .take(remainingQuota)
+              .toList();
 
     final plan = planSession(
       stage: _stage,
@@ -88,6 +93,24 @@ class SessionController {
     unit = null;
 
     if (_reviewQueue.isEmpty && _newWordQueue.isEmpty) {
+      // 恢复路径：巩固阶段被打断（新词已落库但未打卡）时，
+      // 用当天学过的词恢复到巩固阶段，保证当天能完成打卡、连击不中断。
+      final learnedTodayWords = [
+        for (final s in states)
+          if (_sameDay(s.learnedOn, now)) s.word,
+      ];
+      if (learnedTodayWords.isNotEmpty && !await store.hasCheckIn(now)) {
+        _learnedToday.addAll(learnedTodayWords);
+        unit = content.unitContaining(_stage, learnedTodayWords);
+        if (unit == null) {
+          // 与 _advance 末尾一致：无单元素材则直接完成打卡
+          await store.checkIn(_sessionStart);
+          phase = SessionPhase.done;
+          return false;
+        }
+        phase = SessionPhase.consolidation;
+        return true;
+      }
       phase = SessionPhase.empty;
       return false;
     }

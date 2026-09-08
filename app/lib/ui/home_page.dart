@@ -121,6 +121,8 @@ class HomePage extends ConsumerWidget {
     );
     final started = await controller.start();
     if (!started) {
+      // start() 的恢复路径可能已直接打卡，刷新今日页状态
+      ref.invalidate(todayViewModelProvider);
       if (context.mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('今天的学习任务都完成啦')));
@@ -128,9 +130,14 @@ class HomePage extends ConsumerWidget {
       return false;
     }
     if (context.mounted) {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => SessionPage(controller: controller)),
-      );
+      // 会话（含巩固页）结束返回首页时刷新今日页
+      Navigator.of(context)
+          .push(
+            MaterialPageRoute(
+              builder: (_) => SessionPage(controller: controller),
+            ),
+          )
+          .then((_) => ref.invalidate(todayViewModelProvider));
     }
     return true;
   }

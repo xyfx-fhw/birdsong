@@ -34,11 +34,8 @@ void main() {
     await tmp.delete(recursive: true);
   });
 
-  SessionController controller() => SessionController(
-        store: store,
-        content: content,
-        clock: () => fakeNow,
-      );
+  SessionController controller() =>
+      SessionController(store: store, content: content, clock: () => fakeNow);
 
   test('首次开始：10 个新词，无复习', () async {
     final c = controller();
@@ -109,6 +106,26 @@ void main() {
     await c2.start();
     expect(c2.weekendMode, isTrue);
     expect(c2.phase, SessionPhase.review);
+  });
+
+  test('巩固被打断后，当天重新进入恢复到巩固并可完成打卡', () async {
+    final c1 = controller();
+    await c1.start();
+    for (var i = 0; i < 10; i++) {
+      await c1.answer(correct: true);
+    }
+    expect(c1.phase, SessionPhase.consolidation);
+    // 不调用 completeConsolidation，模拟被电话/杀进程打断
+
+    final c2 = controller();
+    final started = await c2.start();
+    expect(started, isTrue);
+    expect(c2.phase, SessionPhase.consolidation);
+    expect(c2.unit, isNotNull);
+    expect(await store.hasCheckIn(fakeNow), isFalse);
+    await c2.completeConsolidation();
+    expect(c2.phase, SessionPhase.done);
+    expect(await store.hasCheckIn(fakeNow), isTrue);
   });
 
   test('无任务可学时返回 empty', () async {
