@@ -85,3 +85,35 @@ final todayViewModelProvider = FutureProvider<TodayViewModel>((ref) async {
     throttled: plan.newWordsThrottled,
   );
 });
+
+/// 成就视图模型。
+class AchievementsView {
+  AchievementsView({required this.stats, required this.unlockedIds});
+
+  final LearningStats stats;
+  final Set<String> unlockedIds;
+}
+
+final achievementsProvider = FutureProvider<AchievementsView>((ref) async {
+  final store = ref.watch(wordStateStoreProvider);
+  final content = ref.watch(contentRepositoryProvider);
+  final now = DateTime.now();
+  final stage = await store.currentStage();
+  final states = await store.allStates();
+  final stageWords = content.wordsOfStage(stage).map((w) => w.word).toSet();
+  final stageStates = states.where((s) => stageWords.contains(s.word)).toList();
+
+  final stats = LearningStats(
+    totalCheckInDays: await store.checkInCount(),
+    consecutiveDays: await store.streak(now),
+    totalWordsLearned: states.length,
+    graduatedWords: states.where((s) => s.graduated).length,
+    stageWordCount: stageWords.length,
+    stageGraduatedCount: stageStates.where((s) => s.graduated).length,
+  );
+  final unlocked = unlockedAchievements(stats, defaultAchievements);
+  return AchievementsView(
+    stats: stats,
+    unlockedIds: unlocked.map((a) => a.id).toSet(),
+  );
+});

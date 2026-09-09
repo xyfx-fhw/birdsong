@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'controllers/providers.dart';
+import 'ui/achievements/achievements_page.dart';
 import 'ui/home_page.dart';
 import 'ui/onboarding/onboarding_page.dart';
 import 'ui/profile_page.dart';
@@ -52,7 +53,7 @@ class StartupGate extends ConsumerWidget {
   }
 }
 
-/// 底部 3 Tab 骨架：今日 / 词书 / 我的。
+/// 底部 4 Tab 骨架：今日 / 词书 / 成就 / 我的。
 class ShellPage extends StatefulWidget {
   const ShellPage({super.key});
 
@@ -63,7 +64,12 @@ class ShellPage extends StatefulWidget {
 class _ShellPageState extends State<ShellPage> {
   int _index = 0;
 
-  static const _pages = [HomePage(), WordbookPage(), ProfilePage()];
+  static const _pages = [
+    HomePage(),
+    WordbookPage(),
+    AchievementsPage(),
+    ProfilePage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +88,11 @@ class _ShellPageState extends State<ShellPage> {
             icon: Icon(Icons.book_outlined),
             selectedIcon: Icon(Icons.book),
             label: '词书',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.emoji_events_outlined),
+            selectedIcon: Icon(Icons.emoji_events),
+            label: '成就',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),

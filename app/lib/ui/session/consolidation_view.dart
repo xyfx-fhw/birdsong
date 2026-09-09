@@ -30,6 +30,19 @@ class _ConsolidationViewState extends ConsumerState<ConsolidationView> {
 
   Future<void> _finish() async {
     await c.completeConsolidation();
+    final before = await ref
+        .read(achievementsProvider.future)
+        .then((v) => v.unlockedIds);
+    ref.invalidate(achievementsProvider);
+    final after = await ref
+        .read(achievementsProvider.future)
+        .then((v) => v.unlockedIds);
+    final newly = after.difference(before);
+    if (newly.isNotEmpty && mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('解锁 ${newly.length} 个成就，去成就页看看吧')));
+    }
     if (!mounted) return;
     await showDialog<void>(
       context: context,
