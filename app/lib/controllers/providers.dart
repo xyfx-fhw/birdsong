@@ -6,6 +6,7 @@ import '../data/content_repository.dart';
 import '../data/user_database.dart';
 import '../data/word_state_store.dart';
 import '../services/audio_service.dart';
+import '../services/reminder_service.dart';
 import '../services/tts_service.dart';
 import 'session_controller.dart';
 
@@ -35,6 +36,8 @@ final audioServiceProvider = Provider<AudioService>((ref) {
 });
 
 final ttsServiceProvider = Provider<TtsService>((ref) => TtsService());
+
+final reminderServiceProvider = Provider<ReminderService>((ref) => ReminderService());
 
 final sessionControllerProvider = Provider<SessionController>((ref) {
   throw UnimplementedError('会话开始时由 SessionPage override');

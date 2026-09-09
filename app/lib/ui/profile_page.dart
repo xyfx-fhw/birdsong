@@ -3,11 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../controllers/providers.dart';
+import '../services/reminder_service.dart';
 
 /// 我的页：阶段与晋升、手动切换。
-class ProfilePage extends ConsumerWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
+  @override
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   Future<void> _promote(BuildContext context, WidgetRef ref, Stage next) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -35,7 +41,7 @@ class ProfilePage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final stageAsync = ref.watch(currentStageProvider);
     final promoAsync = ref.watch(promotionProvider);
     return Scaffold(
@@ -102,6 +108,58 @@ class ProfilePage extends ConsumerWidget {
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('每日提醒'),
+                  const SizedBox(height: 8),
+                  FutureBuilder<String?>(
+                    future: ref
+                        .read(wordStateStoreProvider)
+                        .setting('reminder_time'),
+                    builder: (context, snap) {
+                      final current = ReminderService.parseTime(snap.data);
+                      return Row(
+                        children: [
+                          Text(
+                            current == null
+                                ? '未设置'
+                                : '${current.hour.toString().padLeft(2, '0')}:${current.minute.toString().padLeft(2, '0')}',
+                          ),
+                          const SizedBox(width: 12),
+                          TextButton(
+                            onPressed: () async {
+                              final picked = await showTimePicker(
+                                context: context,
+                                initialTime:
+                                    current ??
+                                    const TimeOfDay(hour: 20, minute: 0),
+                              );
+                              if (picked != null) {
+                                final store = ref.read(wordStateStoreProvider);
+                                await store.setSetting(
+                                  'reminder_time',
+                                  ReminderService.formatTime(picked),
+                                );
+                                await ref
+                                    .read(reminderServiceProvider)
+                                    .scheduleDaily(picked);
+                                if (context.mounted) setState(() {});
+                              }
+                            },
+                            child: const Text('设置时间'),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ),
