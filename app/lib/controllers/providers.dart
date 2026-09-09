@@ -127,7 +127,10 @@ final promotionProvider = FutureProvider<PromotionCheck>((ref) async {
   final states = await store.allStates();
   final stageWords = content.wordsOfStage(stage).map((w) => w.word).toSet();
   final stageStates = states.where((s) => stageWords.contains(s.word)).toList();
-  return checkPromotion(stageStates: stageStates);
+  return checkPromotion(
+    stageStates: stageStates,
+    stageWordCount: stageWords.length,
+  );
 });
 
 /// 当前阶段。

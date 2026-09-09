@@ -59,7 +59,7 @@ void main() {
         for (var i = 0; i < 8; i++) word('g$i', graduated: true),
         for (var i = 0; i < 2; i++) word('n$i'),
       ];
-      final check = checkPromotion(stageStates: states);
+      final check = checkPromotion(stageStates: states, stageWordCount: states.length);
       expect(check.eligible, isTrue);
       expect(check.graduatedRatio, closeTo(0.8, 0.001));
     });
@@ -69,7 +69,18 @@ void main() {
         for (var i = 0; i < 7; i++) word('g$i', graduated: true),
         for (var i = 0; i < 3; i++) word('n$i'),
       ];
-      expect(checkPromotion(stageStates: states).eligible, isFalse);
+      expect(
+          checkPromotion(stageStates: states, stageWordCount: states.length)
+              .eligible,
+          isFalse);
+    });
+
+    test('未全部学过（词表10词只学8个且全毕业）→ 不可晋升', () {
+      final states = [
+        for (var i = 0; i < 8; i++) word('g$i', graduated: true),
+      ];
+      final check = checkPromotion(stageStates: states, stageWordCount: 10);
+      expect(check.eligible, isFalse);
     });
   });
 }

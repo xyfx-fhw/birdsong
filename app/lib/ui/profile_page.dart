@@ -29,6 +29,7 @@ class ProfilePage extends ConsumerWidget {
     if (confirmed == true) {
       await ref.read(wordStateStoreProvider).setStage(next);
       ref.invalidate(promotionProvider);
+      ref.invalidate(currentStageProvider);
       ref.invalidate(todayViewModelProvider);
     }
   }
