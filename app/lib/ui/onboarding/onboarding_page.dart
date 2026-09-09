@@ -36,32 +36,45 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               const SizedBox(height: 32),
               Text('欢迎使用学个鸟语', style: theme.textTheme.headlineMedium),
               const SizedBox(height: 8),
-              Text('每天一小步，坚持 3-5 年。\n选择你的起始阶段：',
-                  style: theme.textTheme.bodyLarge),
+              Text(
+                '每天一小步，坚持 3-5 年。\n选择你的起始阶段：',
+                style: theme.textTheme.bodyLarge,
+              ),
               const SizedBox(height: 24),
-              for (final stage in Stage.values) ...[
-                RadioListTile<Stage>(
-                  title: Text(stage.label),
-                  subtitle: Text(_stageDesc(stage)),
-                  value: stage,
-                  groupValue: _selected,
-                  onChanged: (s) => setState(() => _selected = s!),
+              RadioGroup<Stage>(
+                groupValue: _selected,
+                onChanged: (s) => setState(() => _selected = s!),
+                child: Column(
+                  children: [
+                    for (final stage in Stage.values) ...[
+                      RadioListTile<Stage>(
+                        title: Text(stage.label),
+                        subtitle: Text(_stageDesc(stage)),
+                        value: stage,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ],
                 ),
-                const SizedBox(height: 8),
-              ],
+              ),
               if (_recommended != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: Text('测试推荐：${_recommended!.label}',
-                      style: theme.textTheme.bodyMedium
-                          ?.copyWith(color: theme.colorScheme.primary)),
+                  child: Text(
+                    '测试推荐：${_recommended!.label}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
                 ),
               const Spacer(),
               OutlinedButton(
                 onPressed: () async {
                   final result = await Navigator.of(context).push<Stage?>(
-                      MaterialPageRoute(
-                          builder: (_) => const PlacementTestPage()));
+                    MaterialPageRoute(
+                      builder: (_) => const PlacementTestPage(),
+                    ),
+                  );
                   if (result != null) {
                     setState(() {
                       _recommended = result;
@@ -74,7 +87,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               const SizedBox(height: 12),
               FilledButton(
                 style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16)),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
                 onPressed: () async {
                   await _finish();
                   ref.invalidate(onboardedProvider);
@@ -89,8 +103,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   String _stageDesc(Stage stage) => switch (stage) {
-        Stage.intermediate => '3000 词 · 约高中水平，读写流畅',
-        Stage.advanced => '5000 词 · 约研究生水平，职场交流',
-        Stage.professional => '7000 词 · 可过雅思/托福，留学海外',
-      };
+    Stage.intermediate => '3000 词 · 约高中水平，读写流畅',
+    Stage.advanced => '5000 词 · 约研究生水平，职场交流',
+    Stage.professional => '7000 词 · 可过雅思/托福，留学海外',
+  };
 }
