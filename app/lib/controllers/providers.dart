@@ -1,3 +1,4 @@
+import 'package:content_models/content_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:srs_core/srs_core.dart';
 
@@ -117,3 +118,19 @@ final achievementsProvider = FutureProvider<AchievementsView>((ref) async {
     unlockedIds: unlocked.map((a) => a.id).toSet(),
   );
 });
+
+/// 当前阶段晋升检查。
+final promotionProvider = FutureProvider<PromotionCheck>((ref) async {
+  final store = ref.watch(wordStateStoreProvider);
+  final content = ref.watch(contentRepositoryProvider);
+  final stage = await store.currentStage();
+  final states = await store.allStates();
+  final stageWords = content.wordsOfStage(stage).map((w) => w.word).toSet();
+  final stageStates = states.where((s) => stageWords.contains(s.word)).toList();
+  return checkPromotion(stageStates: stageStates);
+});
+
+/// 当前阶段。
+final currentStageProvider = FutureProvider<Stage>(
+  (ref) => ref.watch(wordStateStoreProvider).currentStage(),
+);

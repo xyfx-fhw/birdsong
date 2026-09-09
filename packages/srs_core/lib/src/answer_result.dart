@@ -93,5 +93,6 @@ WordState applyManualLevel(WordState state, Familiarity level, DateTime now) {
     correctCountInLevel: 0,
     lastReviewedAt: now,
     nextDueAt: intervalLadder[level]!.$1.dueFrom(now),
+    graduated: false,
   );
 }
