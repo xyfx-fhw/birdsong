@@ -34,6 +34,7 @@ class _ConsolidationViewState extends ConsumerState<ConsolidationView> {
         .read(achievementsProvider.future)
         .then((v) => v.unlockedIds);
     ref.invalidate(achievementsProvider);
+    ref.invalidate(promotionProvider);
     final after = await ref
         .read(achievementsProvider.future)
         .then((v) => v.unlockedIds);

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../controllers/providers.dart';
 import '../services/reminder_service.dart';
+import 'wordbook/wordbook_page.dart';
 
 /// 我的页：阶段与晋升、手动切换。
 class ProfilePage extends ConsumerStatefulWidget {
@@ -37,6 +38,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ref.invalidate(promotionProvider);
       ref.invalidate(currentStageProvider);
       ref.invalidate(todayViewModelProvider);
+      ref.invalidate(wordbookProvider);
+      ref.invalidate(achievementsProvider);
     }
   }
 
@@ -102,6 +105,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               ref.invalidate(promotionProvider);
                               ref.invalidate(currentStageProvider);
                               ref.invalidate(todayViewModelProvider);
+                              ref.invalidate(wordbookProvider);
+                              ref.invalidate(achievementsProvider);
                             },
                           ),
                       ],
