@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'controllers/providers.dart';
 import 'ui/home_page.dart';
+import 'ui/onboarding/onboarding_page.dart';
 import 'ui/profile_page.dart';
 import 'ui/wordbook/wordbook_page.dart';
 
@@ -17,7 +20,7 @@ class BirdsongApp extends StatelessWidget {
       theme: appThemeLight,
       darkTheme: appThemeDark,
       themeMode: ThemeMode.system,
-      home: const ShellPage(),
+      home: const StartupGate(),
     );
   }
 }
@@ -31,6 +34,22 @@ ThemeData _buildTheme(Brightness brightness) {
     brightness: brightness,
   );
   return ThemeData(useMaterial3: true, colorScheme: scheme);
+}
+
+/// 首启门控：未 Onboarding 显示引导，否则显示主界面。
+class StartupGate extends ConsumerWidget {
+  const StartupGate({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final onboarded = ref.watch(onboardedProvider);
+    return onboarded.when(
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (e, _) => Scaffold(body: Center(child: Text('加载失败: $e'))),
+      data: (done) => done ? const ShellPage() : const OnboardingPage(),
+    );
+  }
 }
 
 /// 底部 3 Tab 骨架：今日 / 词书 / 我的。
@@ -54,9 +73,21 @@ class _ShellPageState extends State<ShellPage> {
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.today_outlined), selectedIcon: Icon(Icons.today), label: '今日'),
-          NavigationDestination(icon: Icon(Icons.book_outlined), selectedIcon: Icon(Icons.book), label: '词书'),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: '我的'),
+          NavigationDestination(
+            icon: Icon(Icons.today_outlined),
+            selectedIcon: Icon(Icons.today),
+            label: '今日',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.book_outlined),
+            selectedIcon: Icon(Icons.book),
+            label: '词书',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: '我的',
+          ),
         ],
       ),
     );

@@ -4,6 +4,7 @@ import 'package:birdsong_app/app.dart';
 import 'package:birdsong_app/controllers/providers.dart';
 import 'package:birdsong_app/data/content_repository.dart';
 import 'package:birdsong_app/data/user_database.dart';
+import 'package:birdsong_app/data/word_state_store.dart';
 import 'package:content_pipeline/content_pipeline.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +29,7 @@ void main() {
       );
       content = ContentRepository.open(dbPath);
       userDb = UserDatabase(NativeDatabase.memory());
+      await WordStateStore(userDb).setSetting('onboarded', 'true');
     });
     addTearDown(() => tmp.deleteSync(recursive: true));
     addTearDown(content.dispose);

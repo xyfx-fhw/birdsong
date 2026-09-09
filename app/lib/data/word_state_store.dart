@@ -19,9 +19,8 @@ class WordStateStore {
     return rows.map(_toDomain).toList();
   }
 
-  Future<void> save(WordState s) => db
-      .into(db.learnedWords)
-      .insertOnConflictUpdate(_toCompanion(s));
+  Future<void> save(WordState s) =>
+      db.into(db.learnedWords).insertOnConflictUpdate(_toCompanion(s));
 
   // ---- 打卡 ----
 
@@ -32,17 +31,17 @@ class WordStateStore {
       .insertOnConflictUpdate(CheckInsCompanion.insert(day: _dayStart(day)));
 
   Future<bool> hasCheckIn(DateTime day) async {
-    final row = await (db.select(db.checkIns)
-          ..where((t) => t.day.equals(_dayStart(day))))
-        .getSingleOrNull();
+    final row = await (db.select(
+      db.checkIns,
+    )..where((t) => t.day.equals(_dayStart(day)))).getSingleOrNull();
     return row != null;
   }
 
   /// 连续打卡天数：今天已打卡则从今天往回数，否则从昨天往回数。
   Future<int> streak(DateTime today) async {
-    final rows = await (db.select(db.checkIns)
-          ..orderBy([(t) => OrderingTerm.desc(t.day)]))
-        .get();
+    final rows = await (db.select(
+      db.checkIns,
+    )..orderBy([(t) => OrderingTerm.desc(t.day)])).get();
     final days = rows.map((r) => r.day).toSet();
     var cursor = _dayStart(today);
     if (!days.contains(cursor)) {
@@ -59,9 +58,9 @@ class WordStateStore {
   // ---- 设置 ----
 
   Future<Stage> currentStage() async {
-    final row = await (db.select(db.appSettings)
-          ..where((t) => t.key.equals(_stageKey)))
-        .getSingleOrNull();
+    final row = await (db.select(
+      db.appSettings,
+    )..where((t) => t.key.equals(_stageKey))).getSingleOrNull();
     if (row == null) return Stage.intermediate;
     return Stage.fromName(row.value);
   }
@@ -69,22 +68,44 @@ class WordStateStore {
   Future<void> setStage(Stage stage) => db
       .into(db.appSettings)
       .insertOnConflictUpdate(
-          AppSettingsCompanion.insert(key: _stageKey, value: stage.name));
+        AppSettingsCompanion.insert(key: _stageKey, value: stage.name),
+      );
+
+  // ---- 通用设置 ----
+
+  Future<String?> setting(String key) async {
+    final row = await (db.select(
+      db.appSettings,
+    )..where((t) => t.key.equals(key))).getSingleOrNull();
+    return row?.value;
+  }
+
+  Future<void> setSetting(String key, String value) => db
+      .into(db.appSettings)
+      .insertOnConflictUpdate(
+        AppSettingsCompanion.insert(key: key, value: value),
+      );
+
+  Future<int> checkInCount() async {
+    final rows = await db.select(db.checkIns).get();
+    return rows.length;
+  }
 
   // ---- 映射 ----
 
   WordState _toDomain(LearnedWord r) => WordState(
-        word: r.word,
-        familiarity: Familiarity.values[r.familiarity],
-        correctCountInLevel: r.correctCountInLevel,
-        learnedOn: r.learnedOn,
-        lastReviewedAt: r.lastReviewedAt,
-        nextDueAt: r.nextDueAt,
-        missedOn: r.missedOn,
-        graduated: r.graduated,
-      );
+    word: r.word,
+    familiarity: Familiarity.values[r.familiarity],
+    correctCountInLevel: r.correctCountInLevel,
+    learnedOn: r.learnedOn,
+    lastReviewedAt: r.lastReviewedAt,
+    nextDueAt: r.nextDueAt,
+    missedOn: r.missedOn,
+    graduated: r.graduated,
+  );
 
-  LearnedWordsCompanion _toCompanion(WordState s) => LearnedWordsCompanion.insert(
+  LearnedWordsCompanion _toCompanion(WordState s) =>
+      LearnedWordsCompanion.insert(
         word: s.word,
         familiarity: s.familiarity.index,
         correctCountInLevel: Value(s.correctCountInLevel),

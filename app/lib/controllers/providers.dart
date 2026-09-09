@@ -21,6 +21,12 @@ final wordStateStoreProvider = Provider<WordStateStore>(
   (ref) => WordStateStore(ref.watch(userDatabaseProvider)),
 );
 
+/// 是否完成 Onboarding。
+final onboardedProvider = FutureProvider<bool>((ref) async {
+  final store = ref.watch(wordStateStoreProvider);
+  return (await store.setting('onboarded')) == 'true';
+});
+
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
   ref.onDispose(service.dispose);
