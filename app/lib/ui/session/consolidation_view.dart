@@ -226,7 +226,7 @@ class _ConsolidationViewState extends ConsumerState<ConsolidationView> {
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  result ? '正确' : '再想想（参考答案在完成后可见）',
+                  result ? '正确' : '再想想',
                   style: TextStyle(
                     color: result ? Colors.green : Colors.orange,
                   ),

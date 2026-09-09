@@ -31,9 +31,12 @@ class WordDetailSheet extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(entry.word, style: theme.textTheme.headlineSmall),
-                    Text(entry.phonetic,
-                        style: theme.textTheme.bodyMedium
-                            ?.copyWith(color: theme.colorScheme.outline)),
+                    Text(
+                      entry.phonetic,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.outline,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -44,8 +47,10 @@ class WordDetailSheet extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text('${entry.pos} ${entry.meaningZh}',
-              style: theme.textTheme.titleMedium),
+          Text(
+            '${entry.pos} ${entry.meaningZh}',
+            style: theme.textTheme.titleMedium,
+          ),
           const Divider(height: 24),
           for (final ex in entry.examples) ...[
             Row(
@@ -61,9 +66,12 @@ class WordDetailSheet extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(ex.en),
-                      Text(ex.zh,
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: theme.colorScheme.outline)),
+                      Text(
+                        ex.zh,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.outline,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -81,15 +89,28 @@ class WordDetailSheet extends ConsumerWidget {
   }
 }
 
-class _FamiliarityPicker extends ConsumerWidget {
+class _FamiliarityPicker extends ConsumerStatefulWidget {
   const _FamiliarityPicker({required this.entry});
 
   final WordEntry entry;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_FamiliarityPicker> createState() => _FamiliarityPickerState();
+}
+
+class _FamiliarityPickerState extends ConsumerState<_FamiliarityPicker> {
+  Future<WordState?>? _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _loadState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return FutureBuilder<WordState?>(
-      future: _loadState(ref),
+      future: _future,
       builder: (context, snapshot) {
         final current = snapshot.data?.familiarity;
         return Wrap(
@@ -100,7 +121,7 @@ class _FamiliarityPicker extends ConsumerWidget {
                 label: Text(level.label),
                 selected: current == level,
                 onSelected: (_) async {
-                  await _applyLevel(ref, level);
+                  await _applyLevel(level);
                 },
               ),
           ],
@@ -109,23 +130,27 @@ class _FamiliarityPicker extends ConsumerWidget {
     );
   }
 
-  Future<WordState?> _loadState(WidgetRef ref) async {
+  Future<WordState?> _loadState() async {
     final states = await ref.read(wordStateStoreProvider).allStates();
     for (final s in states) {
-      if (s.word == entry.word) return s;
+      if (s.word == widget.entry.word) return s;
     }
     return null;
   }
 
-  Future<void> _applyLevel(WidgetRef ref, Familiarity level) async {
+  Future<void> _applyLevel(Familiarity level) async {
     final store = ref.read(wordStateStoreProvider);
     final states = await store.allStates();
     WordState? state;
     for (final s in states) {
-      if (s.word == entry.word) state = s;
+      if (s.word == widget.entry.word) state = s;
     }
     // 未学过的词手动调档 = 以当前时间为 learnedOn 建状态
-    state ??= WordState.newWord(entry.word, DateTime.now());
+    state ??= WordState.newWord(widget.entry.word, DateTime.now());
     await store.save(applyManualLevel(state, level, DateTime.now()));
+    if (!mounted) return;
+    setState(() {
+      _future = _loadState();
+    });
   }
 }

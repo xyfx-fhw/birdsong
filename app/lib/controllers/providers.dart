@@ -8,7 +8,6 @@ import '../data/word_state_store.dart';
 import '../services/audio_service.dart';
 import '../services/reminder_service.dart';
 import '../services/tts_service.dart';
-import 'session_controller.dart';
 
 /// 以下两个 provider 在 main() 中 override（初始化是异步的）。
 final contentRepositoryProvider = Provider<ContentRepository>(
@@ -37,11 +36,9 @@ final audioServiceProvider = Provider<AudioService>((ref) {
 
 final ttsServiceProvider = Provider<TtsService>((ref) => TtsService());
 
-final reminderServiceProvider = Provider<ReminderService>((ref) => ReminderService());
-
-final sessionControllerProvider = Provider<SessionController>((ref) {
-  throw UnimplementedError('会话开始时由 SessionPage override');
-});
+final reminderServiceProvider = Provider<ReminderService>(
+  (ref) => ReminderService(),
+);
 
 /// 今日页视图模型。
 class TodayViewModel {
